@@ -3,16 +3,23 @@ agp = "8.8.0-rc02"
 junitJupiterApi = "5.11.2"
 kotlin = "1.9.24"
 chicory = "999-SNAPSHOT"
-
+mavenModel = "3.9.6"
+aether = "1.1.0"
 [libraries]
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitJupiterApi" }
 chicory-runtime = { module = "com.dylibso.chicory:runtime", version.ref = "chicory"}
 chicory-wasm = { module = "com.dylibso.chicory:wasm", version.ref = "chicory"}
 chicory-wasmCorpus = { module = "com.dylibso.chicory:wasm-corpus", version.ref = "chicory"}
 android-gradle-plugin-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp"}
+androidx-test-runner = { module = "androidx.test:runner", version = "1.6.2" }
+junit4 = { module = "junit:junit", version = "4.13.2" }
+truth = { module = "com.google.truth:truth", version = "1.4.4"}
+mavenModel-model = { module = "org.apache.maven:maven-model", version.ref = "mavenModel" }
+mavenModel-builder = { module = "org.apache.maven:maven-model-builder", version.ref = "mavenModel" }
 [plugins]
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 android-junit5 = { id = "de.mannodermaus.android-junit5", version = "1.11.2.0"}
+
 

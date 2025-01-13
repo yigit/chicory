@@ -32,6 +32,15 @@ Tests in this project can be run via:
 cd android-tests && ./gradlew device-tests:connectedCheck
 ```
 
+This project includes a device test per maven project. To list them, you can run:
+
+```
+./gradlew device-tests:tasks --group verification|grep connected
+xconnectedCheck - Runs all device checks on currently connected devices.
+connectedRuntimeModuleDebugAndroidTest - Tests for the runtime maven module
+connectedRuntimeTestsModuleDebugAndroidTest - Tests for the runtime-test maven module
+```
+
 The dependencies between this project and the maven project are setup properly
 such that, if the code in the main maven project changes, this android project
 will recompile the repository and run up-to-date tests.

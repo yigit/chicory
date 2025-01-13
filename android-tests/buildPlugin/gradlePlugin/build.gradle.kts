@@ -6,6 +6,10 @@ dependencies {
     implementation(gradleApi())
     implementation(gradleKotlinDsl())
     implementation(libs.android.gradle.plugin.api)
+    implementation(libs.mavenModel.model)
+    implementation(libs.mavenModel.builder)
+    testImplementation(libs.junit4)
+    testImplementation(libs.truth)
 }
 
 configure<GradlePluginDevelopmentExtension> {
