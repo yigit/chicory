@@ -42,7 +42,6 @@ jobs:
         arch: x86_64
         force-avd-creation: false
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-        disable-animations: false
         script: echo "Generated AVD snapshot for caching."
     - name: Run tests
       uses: reactivecircus/android-emulator-runner@v2
@@ -50,18 +49,14 @@ jobs:
         api-level: ${{ matrix.api-level }}
         target: google_apis
         arch: x86_64
+        force-avd-creation: false
+        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         script: cd android-tests && ./gradlew connectedCheck
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        api-level: ${{ matrix.api-level }}
-        target: google_apis
-        arch: x86_64
-        force-avd-creation: false
-        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-        disable-animations: false
-        name: test-results
+        name: test-results-${{ matrix.api-level }}
         path: |
           android-tests/device-tests/build/outputs/androidTest-results/
           android-tests/device-tests/build/reports/androidTests/
