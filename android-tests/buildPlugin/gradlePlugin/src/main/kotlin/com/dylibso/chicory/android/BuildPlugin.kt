@@ -33,14 +33,9 @@ class BuildPlugin : Plugin<Settings> {
                 )
             }
 
-            val rootProjectPom = PomParser.parse(
-                target.rootDir.resolve(MAIN_PROJECT_RELATIVE_DIR).resolve("pom.xml"),
-                parent = null
-            )
-
             rootProject.subprojects { project ->
                 project.extensions.create("chicory", CopyTestsExtension::class.java,
-                    project, target.rootDir.resolve(MAIN_PROJECT_RELATIVE_DIR), rootProjectPom)
+                    project, target.rootDir.resolve(MAIN_PROJECT_RELATIVE_DIR))
                 project.tasks.configureEach { task ->
                     // make sure local repository is built before running any tasks
                     task.dependsOn(buildRepoTask)
