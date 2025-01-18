@@ -17,14 +17,19 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: 17
+        # Use maven cache. Gradle's caching is controlled by its own action.
         cache: maven
+    # Setup Gradle. Cache will be readonly except for the main branch.
+    # see: https://github.com/gradle/actions/blob/main/docs/setup-gradle.md#using-the-cache-read-only
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
+    # Setup KVM to speedup the emulator.
     - name: Enable KVM
       run: |
         echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
         sudo udevadm control --reload-rules
         sudo udevadm trigger --name-match=kvm
+    # Reload AVD from the cache, if available.
     - name: AVD cache
       uses: actions/cache@v4
       id: avd-cache
@@ -33,6 +38,7 @@ jobs:
           ~/.android/avd/*
           ~/.android/adb*
         key: avd-${{ matrix.api-level }}
+    # create AVD if cache failed.
     - name: create AVD and generate snapshot for caching
       if: steps.avd-cache.outputs.cache-hit != 'true'
       uses: reactivecircus/android-emulator-runner@v2
@@ -56,7 +62,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: test-results-${{ matrix.api-level }}
+        name: android-test-results-for-api-${{ matrix.api-level }}
         path: |
           android-tests/device-tests/build/outputs/androidTest-results/
           android-tests/device-tests/build/reports/androidTests/
