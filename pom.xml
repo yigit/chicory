@@ -505,10 +505,8 @@
               <include>android-tests/**/*.kt</include>
             </includes>
             <ktfmt>
+              <!-- there is no AOSP style for ktfmt, hence using Kotlin style -->
               <style>KOTLINLANG</style>
-              <maxWidth>120</maxWidth>
-              <blockIndent>4</blockIndent>
-              <continuationIndent>8</continuationIndent>
               <removeUnusedImports>true</removeUnusedImports>
               <manageTrailingCommas>true</manageTrailingCommas>
             </ktfmt>

@@ -56,19 +56,25 @@ dependencies {
 fun addLibraryTests(configurationName: String, libraryPath: String) {
     val taskSuffix = libraryPath
     val jarTask =
-            project.tasks.register("jarTestClassesFor${taskSuffix.capitalizeAsciiOnly()}", Jar::class.java) {
-                archiveBaseName.set("${taskSuffix}Tests")
-                from(mainProjectDirectory.resolve(libraryPath).resolve("target/test-classes"))
-                destinationDirectory.set(project.layout.buildDirectory.dir("testJars/$taskSuffix"))
-            }
+        project.tasks.register(
+            "jarTestClassesFor${taskSuffix.capitalizeAsciiOnly()}",
+            Jar::class.java,
+        ) {
+            archiveBaseName.set("${taskSuffix}Tests")
+            from(mainProjectDirectory.resolve(libraryPath).resolve("target/test-classes"))
+            destinationDirectory.set(project.layout.buildDirectory.dir("testJars/$taskSuffix"))
+        }
     // Add the jar task's output as a dependency.
     // Gradle will figure out that it needs to run the task before compiling the
     // project.
     project.dependencies.add(
-            configurationName,
-            project.dependencies.create(
-                    project.files({ jarTask.get().destinationDirectory.asFileTree.matching { include("*.jar") } })
-                            .builtBy(jarTask)
-            ),
+        configurationName,
+        project.dependencies.create(
+            project
+                .files({
+                    jarTask.get().destinationDirectory.asFileTree.matching { include("*.jar") }
+                })
+                .builtBy(jarTask)
+        ),
     )
 }
