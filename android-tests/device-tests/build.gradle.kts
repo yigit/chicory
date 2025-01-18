@@ -23,6 +23,7 @@ android {
         create("runtime") {
             dimension = chicoryDimension
         }
+        // add future modules similar to the runtime configuration above.
     }
 
     compileOptions {
@@ -76,6 +77,9 @@ fun addLibraryTests(
             )
         )
     }
+    // Add the jar task's output as a dependency.
+    // Gradle will figure out that it needs to run the task before compiling the
+    // project.
     project.dependencies.add(
         configurationName,
         project.dependencies.create(

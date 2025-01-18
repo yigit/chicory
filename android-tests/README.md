@@ -1,4 +1,4 @@
-This is a Android project designed to run Chicory tests on device.
+This is an Android project designed to run Chicory tests on device.
 
 Since Chicory uses maven and Android doesn't have official maven
 support, we cannot make Android testing part of the main build.
@@ -15,13 +15,13 @@ Inside the root `build.gradle.kts` file, we setup a task that creates a
 maven repository from the outputs of the main project.
 
 The dependencies between this project and the maven project are setup properly
-such that, if the code in the main maven project changes, this android project
+such that, if the code in the main maven project changes, this Android project
 will recompile the repository and run up-to-date tests.
 
 To avoid re-building the main project (e.g. in CI), you can also pass
-`CHICORY_REPO` environment variable, in which case, this android project will
-re-use its output instead of recompile (but it won't make any attempt to
-compile their tests either)
+`CHICORY_REPO` environment variable, in which case, this Android project will
+re-use its output instead of recompiling the main project.
+(It won't make any attempt to compile their tests either)
 ```
 mvn deploy -DaltDeploymentRepository=local-repo::default::file:./local-repo -DskipTests
 cd android-tests && CHICORY_REPO=../local-repo ./gradlew device-tests:connectedCheck

@@ -1,4 +1,4 @@
 package com.dylibso.runtimeTests
 
-// not to have empty sources, which will disable the test suite
+// we need a file here to prevent gradle from skipping tests due to no inputs.
 object Placeholder
