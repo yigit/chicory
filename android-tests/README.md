@@ -38,5 +38,3 @@ Or, to run just one flavor (1 module from the main repo), you can use its test t
 // connected<mainModuleNameCapitalized>DebugAndroidTest
 cd android-tests && ./gradlew device-tests:connectedRuntimeDebugAndroidTest
 ```
-
-

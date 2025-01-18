@@ -11,4 +11,5 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
 include(":device-tests")
