@@ -38,6 +38,8 @@ jobs:
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: ${{ matrix.api-level }}
+        target: google_apis
+        arch: x86_64
         force-avd-creation: false
         emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: false
@@ -53,8 +55,12 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
+        api-level: ${{ matrix.api-level }}
+        target: google_apis
+        arch: x86_64
         force-avd-creation: false
-        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: false
         name: test-results
         path: |
           android-tests/device-tests/build/outputs/androidTest-results/
