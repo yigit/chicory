@@ -22,6 +22,7 @@ android {
     flavorDimensions += chicoryDimension
     productFlavors {
         create("runtime") { dimension = chicoryDimension }
+        create("runtimeTests") { dimension = chicoryDimension }
         // add future modules similar to the runtime configuration above.
     }
 
@@ -32,10 +33,22 @@ android {
     kotlinOptions { jvmTarget = "11" }
 }
 
+configurations.configureEach {
+    resolutionStrategy.capabilitiesResolution.withCapability("com.google.guava:listenablefuture") {
+        select("com.google.guava:guava:0")
+    }
+}
+
 dependencies {
     // "androidTestRuntimeImplementation" name here comes from Android's product
     // flavor convention. androidTest<productFlavorName>Implementation
     addLibraryTests(configurationName = "androidTestRuntimeImplementation", libraryPath = "runtime")
+    addLibraryTests(
+        configurationName = "androidTestRuntimeTestsImplementation",
+        libraryPath = "runtime-tests",
+    )
+    "androidTestRuntimeTestsImplementation"(libs.chicory.wabt)
+    "androidTestRuntimeTestsImplementation"(libs.chicory.runtimeTests)
     // common dependencies can be added here
     // if you need to add a dependency on a specific module, you can use
     // "androidTest<productFlavorName>Implementation"(<your dependency>)

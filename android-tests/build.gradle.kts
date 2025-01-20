@@ -21,7 +21,6 @@ constructor(private val execOps: ExecOperations, private val filesystemOps: File
     DefaultTask() {
     @get:Input @get:Optional abstract val prebuiltRepositoryArg: Property<String>
     @get:Internal abstract val mainProjectDirectory: DirectoryProperty
-    @get:Internal abstract val androidProjectDirectory: DirectoryProperty
 
     /**
      * Since our project is in the same directory as the main project, any changes would invalidate
@@ -40,13 +39,7 @@ constructor(private val execOps: ExecOperations, private val filesystemOps: File
                     // otherwise, just building them invalidates the task.
                     exclude("**/target/**")
                     // exclude our project
-                    exclude(
-                        androidProjectDirectory
-                            .get()
-                            .asFile
-                            .relativeTo(mainProjectDirectory.get().asFile)
-                            .path + "/**"
-                    )
+                    exclude("android-tests/**")
                 }
             }
 
@@ -88,7 +81,6 @@ val localMavenRepoDir = project.layout.buildDirectory.get().asFile.resolve("chic
 val buildRepoTask: TaskProvider<PrepareRepositoryTask> =
     rootProject.tasks.register("prepareRepository", PrepareRepositoryTask::class) {
         prebuiltRepositoryArg.set(rootProject.providers.environmentVariable("CHICORY_REPO"))
-        androidProjectDirectory.set(project.layout.projectDirectory)
         mainProjectDirectory.set(rootProject.layout.projectDirectory.dir("../."))
         repositoryLocation.set(localMavenRepoDir)
     }
