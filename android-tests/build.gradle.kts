@@ -74,9 +74,15 @@ constructor(private val execOps: ExecOperations, private val filesystemOps: File
                 args(
                     "deploy",
                     "-DaltDeploymentRepository=local-repo::default::${repositoryLocation.get().asFile.toURI()}",
-                    "-DskipTests",
+                    "-pl",
+                    "runtime,runtime-tests",
+                    "-am",
                     "-Dspotless.skip=true",
                     "-DskipCheckStyle=true",
+                    "-Dmaven.javadoc.skip=true",
+                    "-Dcheckstyle.skip",
+                    "-Denforcer.skip=true",
+                    "-Dmaven.test.skip=true",
                 )
             }
         }
@@ -106,7 +112,9 @@ project.subprojects {
         maven { url = localMavenRepoDir.toURI() }
     }
     tasks.configureEach {
-        // make sure local repository is built before running any tasks
-        dependsOn(buildRepoTask)
+        // make sure local repository is built before running any tasks, except for clean
+        if (name != "clean") {
+            dependsOn(buildRepoTask)
+        }
     }
 }

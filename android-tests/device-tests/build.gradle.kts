@@ -1,4 +1,3 @@
-import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.capitalizeAsciiOnly
 
 val mainProjectDirectory = rootProject.projectDir.resolve("../.")
@@ -32,6 +31,7 @@ android {
     kotlinOptions { jvmTarget = "11" }
 }
 
+
 dependencies {
     // "androidTestRuntimeImplementation" name here comes from Android's product
     // flavor convention. androidTest<productFlavorName>Implementation
@@ -54,16 +54,14 @@ dependencies {
  * @param libraryPath Library path relative to the main chicory maven project
  */
 fun addLibraryTests(configurationName: String, libraryPath: String) {
-    val taskSuffix = libraryPath
-    val jarTask =
-        project.tasks.register(
-            "jarTestClassesFor${taskSuffix.capitalizeAsciiOnly()}",
-            Jar::class.java,
-        ) {
-            archiveBaseName.set("${taskSuffix}Tests")
-            from(mainProjectDirectory.resolve(libraryPath).resolve("target/test-classes"))
-            destinationDirectory.set(project.layout.buildDirectory.dir("testJars/$taskSuffix"))
-        }
+    val jarTask = project.tasks.register<MavenTestJarTask>(
+        "jarTestClassesFor${libraryPath.capitalizeAsciiOnly()}",
+    ) {
+        this.projectName.set(libraryPath)
+        this.mainProjectDirectory.set(
+            project.rootProject.layout.projectDirectory.dir("../.")
+        )
+    }
     // Add the jar task's output as a dependency.
     // Gradle will figure out that it needs to run the task before compiling the
     // project.
@@ -71,10 +69,43 @@ fun addLibraryTests(configurationName: String, libraryPath: String) {
         configurationName,
         project.dependencies.create(
             project
-                .files({
-                    jarTask.get().destinationDirectory.asFileTree.matching { include("*.jar") }
-                })
-                .builtBy(jarTask)
+                .files(jarTask.flatMap {
+                        it.outputJar
+                    }
+                ).builtBy(jarTask)
         ),
     )
+}
+
+/**
+ * Runs the maven test-jar task for the given project and exports its output jar via the
+ * [outputJar] property.
+ */
+@DisableCachingByDefault(because = "Uses maven")
+abstract class MavenTestJarTask @Inject constructor(
+    private val execOps: ExecOperations
+) : DefaultTask() {
+    @get:Internal abstract val mainProjectDirectory: DirectoryProperty
+    @get:Internal abstract val projectName: Property<String>
+
+    @get:OutputFile
+    val outputJar
+        get() = mainProjectDirectory.dir(projectName).map {
+            it.dir("target").asFileTree.matching {
+                include("*tests.jar")
+            }
+        }
+
+    @TaskAction
+    fun createJar() {
+        execOps.exec {
+            executable = "mvn"
+            workingDir = mainProjectDirectory.get().asFile
+            args(
+                "jar:test-jar",
+                "-pl",
+                projectName.get(),
+            )
+        }
+    }
 }
