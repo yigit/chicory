@@ -76,7 +76,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           working-directory: android-tests
-          script: ./gradlew device-tests:connectedCheck -Pandroid.testInstrumentationRunnerArguments.numShards=3 -Pandroid.testInstrumentationRunnerArguments.shardIndex=${{ matrix.shard }}
+          script: ./gradlew --scan device-tests:connectedCheck -Pandroid.testInstrumentationRunnerArguments.numShards=3 -Pandroid.testInstrumentationRunnerArguments.shardIndex=${{ matrix.shard }}
       # GitHub upload action doesn't support files with : in them, which is used in our tests results.
       # We zip them first to prevent that error.
       - name: Zip test results
