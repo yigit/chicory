@@ -11,6 +11,7 @@ jobs:
     strategy:
       matrix:
         api-level: [33, 35]
+        shard: [0, 1, 2]
     steps:
     - name: Checkout sources
       uses: actions/checkout@v4
@@ -64,12 +65,15 @@ jobs:
         force-avd-creation: false
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         working-directory: android-tests
-        script: ./gradlew device-tests:connectedCheck
+        script: |
+          ./gradlew device-tests:connectedCheck \
+            -Pandroid.testInstrumentationRunnerArguments.numShards=3 \
+            -Pandroid.testInstrumentationRunnerArguments.shardIndex=${{ matrix.shard }}
     - name: Upload test results
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: android-test-results-for-api-${{ matrix.api-level }}
+        name: android-test-results-for-api-${{ matrix.api-level }}-shard${{ matrix.shard }}
         path: |
           android-tests/device-tests/build/outputs/androidTest-results/
           android-tests/device-tests/build/reports/androidTests/
