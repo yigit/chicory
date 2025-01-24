@@ -76,10 +76,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           working-directory: android-tests
-          script: |
-            ./gradlew device-tests:connectedCheck \
-              -Pandroid.testInstrumentationRunnerArguments.numShards=3 \
-              -Pandroid.testInstrumentationRunnerArguments.shardIndex=${{ matrix.shard }}
+          script: ./gradlew device-tests:connectedCheck -Pandroid.testInstrumentationRunnerArguments.numShards=3 -Pandroid.testInstrumentationRunnerArguments.shardIndex=${{ matrix.shard }}
 
       - name: Upload test results
         if: always()
