@@ -7,7 +7,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.stream.Stream;
 import net.lingala.zip4j.ZipFile;
@@ -35,14 +34,15 @@ public class TestSuiteDownloader {
             URL url = new URL(testSuiteRepo + "/archive/" + zipName);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-
+            Path tempDir = Files.createTempDirectory("test-suite-download");
             try (InputStream in = con.getInputStream()) {
-                var zipFile = Paths.get("target/" + zipName);
+                var zipFile = tempDir.resolve(zipName);
                 Files.write(zipFile, in.readAllBytes());
                 try (var zip = new ZipFile(zipFile.toFile())) {
                     zip.renameFile("testsuite-" + testSuiteRepoRef + "/", "testsuite");
-                    zip.extractAll(".");
+                    zip.extractAll(tempDir.toAbsolutePath().toString());
                 }
+                Files.move(tempDir.resolve("testsuite"), testSuiteFolder.toPath());
             } finally {
                 con.disconnect();
             }

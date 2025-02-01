@@ -4,3 +4,5 @@ plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.android.junit5) apply false
 }
+
+buildscript { dependencies { classpath(libs.chicory.testGen) } }
