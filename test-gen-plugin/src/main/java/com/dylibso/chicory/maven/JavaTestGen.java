@@ -18,6 +18,7 @@ import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
+import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.NullLiteralExpr;
@@ -48,19 +49,23 @@ public class JavaTestGen {
 
     private final boolean disableWat;
 
+    private final boolean createFatTest;
+
     public JavaTestGen(
             List<String> excludedTests,
             List<String> excludedMalformedWasts,
             List<String> excludedInvalidWasts,
             List<String> excludedUninstantiableWasts,
             List<String> excludedUnlinkableWasts,
-            boolean disableWat) {
+            boolean disableWat,
+            boolean createFatTest) {
         this.excludedTests = excludedTests;
         this.excludedMalformedWasts = excludedMalformedWasts;
         this.excludedInvalidWasts = excludedInvalidWasts;
         this.excludedUninstantiableWasts = excludedUninstantiableWasts;
         this.excludedUnlinkableWasts = excludedUnlinkableWasts;
         this.disableWat = disableWat;
+        this.createFatTest = createFatTest;
     }
 
     public CompilationUnit generate(String name, Wast wast, String wasmClasspath) {
@@ -278,7 +283,9 @@ public class JavaTestGen {
                             "command type not yet supported " + cmd.type());
             }
         }
-
+        if (createFatTest) {
+            createFatTest(wast.sourceFilename().getName(), testClass, testNumber++);
+        }
         return cu;
     }
 
@@ -323,6 +330,32 @@ public class JavaTestGen {
                 return "ChicoryException";
             default:
                 throw new IllegalArgumentException(typ + "not implemented");
+        }
+    }
+
+    private void createFatTest(
+            String wastName, ClassOrInterfaceDeclaration testClass, int testNumber) {
+        var testsToInvoke =
+                testClass.getMethods().stream()
+                        .filter(
+                                t ->
+                                        t.isAnnotationPresent("Test")
+                                                && !t.isAnnotationPresent("Disabled"))
+                        .collect(Collectors.toList());
+        for (var method : testsToInvoke) {
+            var testAnnotation = method.getAnnotationByName("Test").orElseThrow();
+            method.remove(testAnnotation);
+        }
+        var methodName = "fatTest" + testNumber;
+        var method = testClass.addMethod(methodName, Modifier.Keyword.PUBLIC);
+        method.addAnnotation("Test");
+        method.addSingleMemberAnnotation(
+                "Order", new IntegerLiteralExpr(Integer.toString(testNumber)));
+        method.addSingleMemberAnnotation("DisplayName", new StringLiteralExpr(wastName));
+        for (MethodDeclaration methodDeclaration : testsToInvoke) {
+            method.getBody()
+                    .get()
+                    .addStatement(new MethodCallExpr(methodDeclaration.getNameAsString()));
         }
     }
 

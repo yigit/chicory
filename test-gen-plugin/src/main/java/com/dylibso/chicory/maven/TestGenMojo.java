@@ -119,6 +119,13 @@ public class TestGenMojo extends AbstractMojo {
     @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
 
+    /**
+     * Create only 1 @Test annotated method.
+     * Needed on Android due to https://issuetracker.google.com/issues/330756856
+     */
+    @Parameter(required = false, property = "wasm-test-gen.create-fat-test", defaultValue = "false")
+    private Boolean createFatTest;
+
     @Override
     public void execute() throws MojoExecutionException {
         if (skip) {
@@ -143,7 +150,8 @@ public class TestGenMojo extends AbstractMojo {
                         excludedInvalidWasts,
                         excludedUninstantiableWasts,
                         excludedUnlinkableWasts,
-                        disableWat);
+                        disableWat,
+                        createFatTest);
 
         JavaParserMavenUtils.makeJavaParserLogToMavenOutput(getLog());
 
